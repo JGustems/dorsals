@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Entrega de Dorsals</title>
+  <style>
+    body {
+      background: #121212;
+      color: #eee;
+      font-family: sans-serif;
+      padding: 20px;
+    }
+    h1 { text-align: center; }
+    input, button {
+      width: 100%;
+      padding: 15px;
+      margin-top: 10px;
+      font-size: 1.2em;
+      border-radius: 8px;
+      border: none;
+    }
+    button { background: #03a9f4; color: white; font-weight: bold; }
+    button.cancel { background: #f44336; }
+    #resultat, #stats {
+      margin-top: 20px;
+      padding: 15px;
+      background: #1e1e1e;
+      border-radius: 8px;
+    }
+    .confirmat {
+      background: #4caf50;
+      padding: 10px;
+      margin-top: 10px;
+      border-radius: 6px;
+      text-align: center;
+      font-weight: bold;
+    }
+    .error {
+      background: #f44336;
+      padding: 10px;
+      margin-top: 10px;
+      border-radius: 6px;
+      text-align: center;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>Entrega de Dorsals</h1>
+
+  <input type="text" id="entrada" placeholder="Escaneja DNI o codi QR" autofocus />
+  <button onclick="buscarParticipant()">Cercar</button>
+
+  <div id="resultat"></div>
+
+  <div id="stats">
+    <h3>Estadístiques:</h3>
+    <p><strong>Total:</strong> <span id="total">0</span></p>
+    <p><strong>Entregats:</strong> <span id="entregats">0</span></p>
+    <p><strong>Percentatge:</strong> <span id="percentatge">0%</span></p>
+  </div>
+
+  <script>
+    const baseDeDades = [
+      { dni: "12345678A", nom: "Anna", dorsal: 101, entregat: false },
+      { dni: "23456789B", nom: "Joan", dorsal: 102, entregat: false },
+      { dni: "34567890C", nom: "Maria", dorsal: 103, entregat: false }
+    ];
+
+    function buscarParticipant() {
+      const entrada = document.getElementById("entrada").value.trim();
+      const resultat = document.getElementById("resultat");
+      const participant = baseDeDades.find(p => p.dni === entrada);
+
+      if (!participant) {
+        resultat.innerHTML = `<div class="error">Participant no trobat</div>`;
+        return;
+      }
+
+      if (participant.entregat) {
+        resultat.innerHTML = `
+          <p><strong>Nom:</strong> ${participant.nom}</p>
+          <p><strong>Dorsal:</strong> ${participant.dorsal}</p>
+          <div class="confirmat">Ja entregat!</div>
+        `;
+        return;
+      }
+
+      resultat.innerHTML = `
+        <p><strong>Nom:</strong> ${participant.nom}</p>
+        <p><strong>Dorsal:</strong> ${participant.dorsal}</p>
+        <button onclick="confirmarEntrega('${participant.dni}')">Confirmar Entrega</button>
+        <button class="cancel" onclick="anular()">Cancel·lar</button>
+      `;
+    }
+
+    function confirmarEntrega(dni) {
+      const p = baseDeDades.find(p => p.dni === dni);
+      if (p) {
+        p.entregat = true;
+        document.getElementById("resultat").innerHTML = `<div class="confirmat">Entrega confirmada per ${p.nom}!</div>`;
+        actualitzarEstadistiques();
+      }
+    }
+
+    function anular() {
+      document.getElementById("resultat").innerHTML = "";
+      document.getElementById("entrada").value = "";
+    }
+
+    function actualitzarEstadistiques() {
+      const total = baseDeDades.length;
+      const entregats = baseDeDades.filter(p => p.entregat).length;
+      const percentatge = ((entregats / total) * 100).toFixed(1);
+
+      document.getElementById("total").textContent = total;
+      document.getElementById("entregats").textContent = entregats;
+      document.getElementById("percentatge").textContent = percentatge + "%";
+    }
+
+    actualitzarEstadistiques();
+  </script>
+</body>
+</html>
